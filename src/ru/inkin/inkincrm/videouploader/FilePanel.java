@@ -1,8 +1,14 @@
 package ru.inkin.inkincrm.videouploader;
 
 //import java.io.File;
-import java.util.*;
-import java.awt.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Image;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -12,8 +18,9 @@ public class FilePanel extends JPanel
     private JLabel      titleLabel;
     private JLabel      statLabel;
     private JLabel      thumbLabel;
-    private JLabel      targetSizeLabel;
+    //private JLabel      targetSizeLabel;
     private JButton     removeButton;
+    private JPanel      statusPanel;
 
     public FilePanel()
     {
@@ -34,8 +41,9 @@ public class FilePanel extends JPanel
         createThumbPanel();
         createTitle();
         createStat();
-        createTargetSize();
+        //createTargetSize();
         createRemoveButton();
+        createStatusPanel();
     }
 
     private void createThumbPanel()
@@ -89,17 +97,17 @@ public class FilePanel extends JPanel
 
     private void createStat()
     {
-        String      stat    = InkinCrmVideoUploader.getDisplayFileSize(fileTask.getFile().length());
-        VideoInfo   info    = fileTask.getSourceInfo();
-
-        if (info != null)
-        {
-            stat += ",   " + info.width + " × " + info.height;
-            stat += ",   " + InkinCrmVideoUploader.getDisplayDuration(info.duration);
-        }
-
+//        String      stat    = InkinCrmVideoUploader.getDisplayFileSize(fileTask.getFile().length());
+//        VideoInfo   info    = fileTask.getSourceInfo();
+//
+//        if (info != null)
+//        {
+//            stat += ",   " + info.width + " × " + info.height;
+//            stat += ",   " + InkinCrmVideoUploader.getDisplayDuration(info.duration);
+//        }
+//
         statLabel = new JLabel();
-        statLabel.setText(stat);
+//        statLabel.setText(stat);
         setAlignmentX(Component.LEFT_ALIGNMENT);
 
         GridBagConstraints c = new GridBagConstraints();
@@ -110,21 +118,39 @@ public class FilePanel extends JPanel
         c.anchor    = GridBagConstraints.FIRST_LINE_START;
 
         add(statLabel, c);
+        //updateStat(InkinCrmVideoUploader.getSelectedBitrates());
     }
 
-    private void createTargetSize()
+//    private void createTargetSize()
+//    {
+//        targetSizeLabel = new JLabel();
+//        targetSizeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+//
+//        GridBagConstraints c = new GridBagConstraints();
+//        c.gridx = 1;
+//        c.gridy = 2;
+//        c.weightx   = 1;
+//        c.weighty   = 1;
+//        c.anchor    = GridBagConstraints.FIRST_LINE_START;
+//
+//        add(targetSizeLabel, c);
+//    }
+
+    private void createStatusPanel()
     {
-        targetSizeLabel = new JLabel();
-        targetSizeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statusPanel = new JPanel(new GridBagLayout());
+        setOpaque(true);
+        setBackground(new Color(
+                (float) 0, (float) 0, (float) .3, (float) .3));
 
         GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 2;
+        c.gridx     = 1;
+        c.gridy     = 2;
         c.weightx   = 1;
         c.weighty   = 1;
         c.anchor    = GridBagConstraints.FIRST_LINE_START;
 
-        add(targetSizeLabel, c);
+        add(statusPanel, c);
     }
 
     private void createRemoveButton()
@@ -158,10 +184,36 @@ public class FilePanel extends JPanel
         return new ImageIcon(newimg);  // transform it back
     }
 
-    public void updateTargetSize(Map<String, Integer> selectedBitrates)
+    public void updateStat(Map<String, Integer> selectedBitrates)
+    {
+        //targetSizeLabel.setText(InkinCrmVideoUploader.getDisplayFileSize(bytes));
+        statLabel.setText(getStatString(selectedBitrates));
+    }
+
+    private String getStatString(Map<String, Integer> selectedBitrates)
+    {
+        List<String>    parts       = new ArrayList<>();
+        String          fileSize    = InkinCrmVideoUploader.getDisplayFileSize(fileTask.getFile().length());
+        VideoInfo       info        = fileTask.getSourceInfo();
+
+        if (info != null)
+        {
+            parts.add(info.width + " × " + info.height);
+            parts.add(InkinCrmVideoUploader.getDisplayDuration(info.duration));
+
+            fileSize += " -> " + InkinCrmVideoUploader.getDisplayFileSize(
+                    calculateProjectedFileSize(selectedBitrates));
+        }
+
+        parts.add(fileSize);
+
+        return String.join(",   ", parts);
+    }
+
+    private long calculateProjectedFileSize(Map<String, Integer> selectedBitrates)
     {
         VideoInfo info = fileTask.getSourceInfo();
-        if (info == null) return;
+        if (info == null) return 0;
 
         long bytes = 0;
 
@@ -177,6 +229,21 @@ public class FilePanel extends JPanel
             }
         }
 
-        targetSizeLabel.setText(InkinCrmVideoUploader.getDisplayFileSize(bytes));
+        return bytes;
+    }
+
+    public void showInProgress()
+    {
+        
+    }
+
+    public void showAborted()
+    {
+        
+    }
+
+    public void showComplete()
+    {
+        
     }
 }

@@ -413,7 +413,7 @@ public class MainWindow extends JFrame
 
     private void updateFilePanel(FilePanel panel, Map<String, Integer> selectedBitrates)
     {
-        panel.updateTargetSize(selectedBitrates == null
+        panel.updateStat(selectedBitrates == null
                 ? getSelectedBitrates()
                 : selectedBitrates);
     }
