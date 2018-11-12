@@ -17,12 +17,19 @@ public class VideoVariantConverter
     private String                  variantDirName;
     private VideoVariantSettings    variantSettings;
     private FileTask                fileTask;
+    private float                   duration;
     private VideoSegmentInfo        currentSegmentInfo;
     private int                     nextSegmentIndex            = 0;
     private final List<VideoVariantConverterListener> listeners = new ArrayList<>();
 
     private String                  encryptionIvAsString;
     private String                  encryptionKeyAsString;
+
+    //  Opening 'crypto:D:\.../temp/.../720/720p_0.ts' for writing
+    private final Pattern newSegmentPattern = Pattern.compile("Opening '(crypto:)?(.+\\.ts)' for writing");
+
+    //  frame=   92 fps= 44 q=52.0 size=N/A time=00:00:04.17 bitrate=N/A speed=2.01x
+    private final Pattern progressPattern   = Pattern.compile("^frame=.*time=(\\d+):(\\d+):(\\d+\\.\\d+) ");
 
     public void setVariantSettings(VideoVariantSettings variantSettings)
     {
@@ -47,6 +54,8 @@ public class VideoVariantConverter
     {
         variantDirName = videoDirName + "/" + variantSettings.getHeight();
         new File(variantDirName).mkdirs();
+
+        duration = fileTask.getSourceInfo().duration;
     }
 
     private void createPreencryptionKey()
@@ -173,16 +182,20 @@ public class VideoVariantConverter
 
     private void processLine(String line)
     {
+        Matcher matcher;
         System.out.println("ffmpeg>" + line);
-
-        //  Looking for lines like:
-        //  Opening 'crypto:D:\.../temp/.../720/720p_0.ts' for writing
-        Pattern pattern = Pattern.compile("Opening '(crypto:)?(.+\\.ts)' for writing");
-        Matcher matcher = pattern.matcher(line);
-
+        
+        matcher = newSegmentPattern.matcher(line);
         if (matcher.find())
         {
             processLine_openSegmentFile(matcher.group(2));
+            return;
+        }
+
+        matcher = progressPattern.matcher(line);
+        if (matcher.find())
+        {
+            processLine_progress(matcher);
         }
     }
 
@@ -197,6 +210,21 @@ public class VideoVariantConverter
 
         currentSegmentInfo = new VideoSegmentInfo();
         currentSegmentInfo.localFile = new File(filePath);
+    }
+
+    private void processLine_progress(Matcher matcher)
+    {
+        float position =
+                Integer.parseInt(matcher.group(1)) * 60 * 60
+                + Integer.parseInt(matcher.group(2)) * 60
+                + Float.parseFloat(matcher.group(3));
+
+        float progress = position / duration;
+
+        for (VideoVariantConverterListener listener : listeners)
+        {
+            listener.onProgress(progress);
+        }
     }
 
     /**

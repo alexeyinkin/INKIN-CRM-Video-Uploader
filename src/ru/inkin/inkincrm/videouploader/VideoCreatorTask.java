@@ -143,6 +143,7 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
                 settings.setBitsPerSecond(bitrates.get(resolution));
                 settings.setWidth(width);
                 settings.setHeight(height);
+                settings.setResolutionString(resolution);
 
                 VideoVariantCreatorTask task = processor.createNextTask(this);
                     //this, VideoVariantCreatorTask.class);

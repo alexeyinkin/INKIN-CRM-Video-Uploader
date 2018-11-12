@@ -144,9 +144,9 @@ public class FilePanel extends JPanel
     private void createStatusPanel()
     {
         statusPanel = new JPanel(new GridBagLayout());
-        statusPanel.setOpaque(true);
-        statusPanel.setBackground(new Color(
-                (float) 0, (float) 0, (float) .3, (float) .3));
+        statusPanel.setOpaque(false);
+//        statusPanel.setBackground(new Color(
+//                (float) 0, (float) 0, (float) .3, (float) .3));
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx     = 1;
@@ -257,7 +257,7 @@ public class FilePanel extends JPanel
             c.anchor    = GridBagConstraints.FIRST_LINE_START;
             statusPanel.add(label, c);
 
-            JProgressBar progressBar = new JProgressBar(0, 1000);
+            JProgressBar progressBar = new JProgressBar(0, 100);
             c = new GridBagConstraints();
             c.gridx     = 1;
             c.gridy     = i++;
@@ -271,6 +271,11 @@ public class FilePanel extends JPanel
 
         JFrame mainWindow = (JFrame) SwingUtilities.getWindowAncestor(this);
         mainWindow.pack();
+    }
+
+    public void updateProgress(String resolution, float progress)
+    {
+        progressBars.get(resolution).setValue((int) Math.ceil(progress * 100));
     }
 
     public void showAborted()

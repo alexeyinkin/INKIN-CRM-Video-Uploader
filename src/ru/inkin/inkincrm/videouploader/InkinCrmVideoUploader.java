@@ -523,11 +523,19 @@ public class InkinCrmVideoUploader
 
     public static void showFileInProgress(String filePath)
     {
-        mainWindow.showFilePanelInProgress(filePath);
+        mainWindow.showFileInProgress(filePath);
     }
 
     public static void showFileComplete(String filePath)
     {
-        mainWindow.showFilePanelComplete(filePath);
+        mainWindow.showFileComplete(filePath);
+    }
+
+    public static void updateFileProgress(
+            String  filePath,
+            String  resolution,
+            float   progress)
+    {
+        mainWindow.updateFileProgress(filePath, resolution, progress);
     }
 }

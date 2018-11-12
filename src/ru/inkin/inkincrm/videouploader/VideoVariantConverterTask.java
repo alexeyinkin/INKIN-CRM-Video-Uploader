@@ -4,7 +4,10 @@ public class VideoVariantConverterTask
         extends TaskGeneric<VideoVariantConverterTaskProcessor>
         implements VideoVariantConverterListener
 {
-    private VideoVariantConverter videoVariantConverter;
+    private VideoVariantConverter   videoVariantConverter;
+    private FileTask                fileTask;
+    private String                  filePath;
+    private VideoVariantSettings    videoVariantSettings;
 
     @Override
     public void process()
@@ -16,12 +19,14 @@ public class VideoVariantConverterTask
     {
         VideoVariantCreatorTask parent1     = getVideoVariantCreatorTask();
         VideoCreatorTask        parent2     = parent1.getVideoCreatorTask();
-        FileTask                fileTask    = parent2.getFileTask();
-        VideoVariantSettings    settings    = parent1.getVideoVariantSettings();
 
-        videoVariantConverter = new VideoVariantConverter();
+        fileTask                = parent2.getFileTask();
+        filePath                = fileTask.getFile().getAbsolutePath();
+        videoVariantSettings    = parent1.getVideoVariantSettings();
+        videoVariantConverter   = new VideoVariantConverter();
+
         videoVariantConverter.setFileTask(fileTask);
-        videoVariantConverter.setVariantSettings(settings);
+        videoVariantConverter.setVariantSettings(videoVariantSettings);
         videoVariantConverter.addListener(this);
         videoVariantConverter.start();
 
@@ -42,6 +47,15 @@ public class VideoVariantConverterTask
 
         nextTask.setVideoSegmentInfo(videoSegmentInfo);
         processor.sendTaskToNext(nextTask); //, TaskProcessor.NOT_LAST);
+    }
+
+    @Override
+    public void onProgress(float progress)
+    {
+        InkinCrmVideoUploader.updateFileProgress(
+                filePath,
+                videoVariantSettings.getResolutionString(),
+                progress);
     }
 
     public VideoVariantConverter getConverter()
