@@ -520,4 +520,14 @@ public class InkinCrmVideoUploader
     {
         return mainWindow.getSelectedBitrates();
     }
+
+    public static void showFileInProgress(String filePath)
+    {
+        mainWindow.showFilePanelInProgress(filePath);
+    }
+
+    public static void showFileComplete(String filePath)
+    {
+        mainWindow.showFilePanelComplete(filePath);
+    }
 }

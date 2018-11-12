@@ -284,7 +284,9 @@ public class ServerSettingsWindow extends JFrame
         try
         {
             Desktop desktop = Desktop.getDesktop();
-            desktop.browse(new URI("https://inkin.ru"));
+            desktop.browse(new URI(
+                    InkinCrmVideoUploader.getServerUrl()
+                    + "/admin/list/operation-tokens"));
         }
         catch (Exception e) {}
     }

@@ -24,6 +24,7 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
     {
         if (initVideo())
         {
+            showInProgress();
             startVariants();
             //finalizeQueue(); -- was for testing.
         }
@@ -45,6 +46,11 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
         }
 
         return result;
+    }
+
+    private void showInProgress()
+    {
+        InkinCrmVideoUploader.showFileInProgress(fileTask.getFile().getAbsolutePath());
     }
 
     private boolean createNew()

@@ -356,7 +356,7 @@ public class MainWindow extends JFrame
 
         statusPanel.add(filePanel, c);
         filePanels.put(fileTask.getFile().getAbsolutePath(), filePanel);
-        updateFilePanel(filePanel, null);
+        updateFilePanel(filePanel); //, null);
         pack();
     }
 
@@ -403,19 +403,20 @@ public class MainWindow extends JFrame
      */
     private void updateFilePanels()
     {
-        Map<String, Integer> selectedBitrates = getSelectedBitrates();
+        //Map<String, Integer> selectedBitrates = getSelectedBitrates();
 
         for (FilePanel panel : filePanels.values())
         {
-            updateFilePanel(panel, selectedBitrates);
+            updateFilePanel(panel); //, selectedBitrates);
         }
     }
 
-    private void updateFilePanel(FilePanel panel, Map<String, Integer> selectedBitrates)
+    private void updateFilePanel(FilePanel panel) //, Map<String, Integer> selectedBitrates)
     {
-        panel.updateStat(selectedBitrates == null
-                ? getSelectedBitrates()
-                : selectedBitrates);
+        panel.updateStat();
+//        panel.updateStat(selectedBitrates == null
+//                ? getSelectedBitrates()
+//                : selectedBitrates);
     }
 
     private void updateDropTarget()
@@ -518,5 +519,15 @@ public class MainWindow extends JFrame
         startButton.setVisible(true);
 
         settingsButton.setEnabled(true);
+    }
+
+    public void showFilePanelInProgress(String filePath)
+    {
+        filePanels.get(filePath).showInProgress();
+    }
+
+    public void showFilePanelComplete(String filePath)
+    {
+        filePanels.get(filePath).showComplete();
     }
 }

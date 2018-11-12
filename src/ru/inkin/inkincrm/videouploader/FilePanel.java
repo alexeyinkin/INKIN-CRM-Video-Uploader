@@ -4,12 +4,15 @@ package ru.inkin.inkincrm.videouploader;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.event.*;
+import java.net.URI;
 import javax.swing.*;
 
 public class FilePanel extends JPanel
@@ -21,6 +24,8 @@ public class FilePanel extends JPanel
     //private JLabel      targetSizeLabel;
     private JButton     removeButton;
     private JPanel      statusPanel;
+    private JButton     editInBrowserButton;
+    private final Map<String, JProgressBar> progressBars = new HashMap<>();
 
     public FilePanel()
     {
@@ -36,7 +41,7 @@ public class FilePanel extends JPanel
     {
         setOpaque(true);
         setBackground(new Color(
-                (float) 0, (float) 0.3, (float) 0, (float) .3));
+                (float) .3, (float) .3, (float) 0, (float) .3));
 
         createThumbPanel();
         createTitle();
@@ -139,8 +144,8 @@ public class FilePanel extends JPanel
     private void createStatusPanel()
     {
         statusPanel = new JPanel(new GridBagLayout());
-        setOpaque(true);
-        setBackground(new Color(
+        statusPanel.setOpaque(true);
+        statusPanel.setBackground(new Color(
                 (float) 0, (float) 0, (float) .3, (float) .3));
 
         GridBagConstraints c = new GridBagConstraints();
@@ -184,13 +189,13 @@ public class FilePanel extends JPanel
         return new ImageIcon(newimg);  // transform it back
     }
 
-    public void updateStat(Map<String, Integer> selectedBitrates)
+    public void updateStat()
     {
         //targetSizeLabel.setText(InkinCrmVideoUploader.getDisplayFileSize(bytes));
-        statLabel.setText(getStatString(selectedBitrates));
+        statLabel.setText(getStatString());
     }
 
-    private String getStatString(Map<String, Integer> selectedBitrates)
+    private String getStatString()
     {
         List<String>    parts       = new ArrayList<>();
         String          fileSize    = InkinCrmVideoUploader.getDisplayFileSize(fileTask.getFile().length());
@@ -202,7 +207,7 @@ public class FilePanel extends JPanel
             parts.add(InkinCrmVideoUploader.getDisplayDuration(info.duration));
 
             fileSize += " -> " + InkinCrmVideoUploader.getDisplayFileSize(
-                    calculateProjectedFileSize(selectedBitrates));
+                    calculateProjectedFileSize(fileTask.getSelectedBitrates()));
         }
 
         parts.add(fileSize);
@@ -234,16 +239,95 @@ public class FilePanel extends JPanel
 
     public void showInProgress()
     {
-        
+        emptyStatusPanel();
+
+        Map<String, Integer> bitrates = fileTask.getSelectedBitrates();
+        int i = 0;
+
+        for (String resolution : bitrates.keySet())
+        {
+            GridBagConstraints c;
+
+            JLabel label = new JLabel(resolution + ": ");
+            c = new GridBagConstraints();
+            c.gridx     = 0;
+            c.gridy     = i;
+            c.weightx   = 1;
+            c.weighty   = 1;
+            c.anchor    = GridBagConstraints.FIRST_LINE_START;
+            statusPanel.add(label, c);
+
+            JProgressBar progressBar = new JProgressBar(0, 1000);
+            c = new GridBagConstraints();
+            c.gridx     = 1;
+            c.gridy     = i++;
+            c.weightx   = 1;
+            c.weighty   = 1;
+            c.anchor    = GridBagConstraints.FIRST_LINE_START;
+            statusPanel.add(progressBar, c);
+
+            progressBars.put(resolution, progressBar);
+        }
+
+        JFrame mainWindow = (JFrame) SwingUtilities.getWindowAncestor(this);
+        mainWindow.pack();
     }
 
     public void showAborted()
     {
-        
+        emptyStatusPanel();
     }
 
     public void showComplete()
     {
-        
+        emptyStatusPanel();
+        createEditInBrowserButton();
+
+        setBackground(new Color(
+                (float) 0, (float) 0.3, (float) 0, (float) .3));
+    }
+
+    private void emptyStatusPanel()
+    {
+        for (Component component : statusPanel.getComponents())
+        {
+            statusPanel.remove(component);
+        }
+
+        progressBars.clear();
+    }
+
+    private void createEditInBrowserButton()
+    {
+        editInBrowserButton = new JButton();
+        editInBrowserButton.setText("Edit in Browser...");
+
+        editInBrowserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                editInBrowser();
+            }
+        });
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx     = 0;
+        c.gridy     = 0;
+        c.weightx   = 1;
+        c.weighty   = 1;
+        c.anchor    = GridBagConstraints.LAST_LINE_START;
+        statusPanel.add(editInBrowserButton, c);
+    }
+
+    private void editInBrowser()
+    {
+        try
+        {
+            Desktop desktop = Desktop.getDesktop();
+            desktop.browse(new URI(
+                    InkinCrmVideoUploader.getServerUrl()
+                    + "/admin/list/videos/" + fileTask.getVideoId()));
+        }
+        catch (Exception e) {}
     }
 }
