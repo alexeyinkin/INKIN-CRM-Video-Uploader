@@ -86,11 +86,11 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
                 .add("catalog", "video-segments")
                 //.add("return",  "*")
                 .add("id",      firstSegmentId)
-                .add("column",  "params")
-                .add("value",   baos.toString())
-//                .add("item",    Json.createObjectBuilder()
-//                        .add("params",  baos.toString())
-//                )
+                //.add("column",  "params")
+                //.add("value",   baos.toString())
+                .add("set",     Json.createObjectBuilder()
+                        .add("params",  baos.toString())
+                )
                 .build();
 
         //  TODO: Handle errors.
@@ -107,11 +107,11 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
                 .add("action",  "edit")
                 .add("catalog", "video-variants")
                 .add("id",      videoVariantSettings.getVideoVariantId())
-                .add("column",  "videoVariantFlags")
-                .add("value",   0)
-//                .add("item",    Json.createObjectBuilder()
-//                        .add("videoVariantFlags",   0)  // Uploaded, processed.
-//                )
+                //.add("column",  "videoVariantFlags")
+                //.add("value",   0)
+                .add("set",    Json.createObjectBuilder()
+                        .add("videoVariantFlags",   0)  // Uploaded, processed.
+                )
                 .build();
 
         //  TODO: Handle errors.

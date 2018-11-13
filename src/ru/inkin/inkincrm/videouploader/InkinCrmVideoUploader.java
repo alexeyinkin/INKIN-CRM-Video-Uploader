@@ -300,6 +300,7 @@ public class InkinCrmVideoUploader
     public static void setServerUrl(String url)
     {
         config.put("host", fixServerUrl(url));
+        mainWindow.updateServerLabel();
     }
 
     public static String getServerUrl()

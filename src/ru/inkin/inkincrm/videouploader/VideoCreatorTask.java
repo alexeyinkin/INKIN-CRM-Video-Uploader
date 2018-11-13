@@ -63,7 +63,7 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
                 .add("action",  "new")
                 .add("catalog", "videos")
                 .add("return",  "*")
-                .add("item",    Json.createObjectBuilder()
+                .add("set",     Json.createObjectBuilder()
                         .add("id",                  tempId)
                         .add("title",               fileName)
                         .add("enabled",             true)
@@ -117,8 +117,11 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
                 .add("action",  "edit")
                 .add("catalog", "videos")
                 .add("id",      videoId)
-                .add("column",  "sourceFileName")
-                .add("value",   fileName)
+                .add("set",     Json.createObjectBuilder()
+                        .add("sourceFileName",  fileName)
+                )
+                //.add("column",  "sourceFileName")
+                //.add("value",   fileName)
                 .build();
 
         response = InkinCrmVideoUploader.applyServerCommand(command);

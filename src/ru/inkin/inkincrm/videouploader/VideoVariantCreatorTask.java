@@ -36,7 +36,7 @@ public class VideoVariantCreatorTask extends TaskGeneric<VideoVariantCreatorTask
                 .add("action",  "new")
                 .add("catalog", "video-variants")
                 .add("return",  "*")
-                .add("item",    Json.createObjectBuilder()
+                .add("set",     Json.createObjectBuilder()
                         .add("id",                  tempId)
                         .add("id_variantVideo",     fileTask.getVideoId())
                         .add("width",               settings.getWidth())

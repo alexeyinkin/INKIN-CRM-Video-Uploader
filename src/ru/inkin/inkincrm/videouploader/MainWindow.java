@@ -26,6 +26,7 @@ public class MainWindow extends JFrame
     private JTextField      replaceIdField;
     private JPanel          replacePanel;
 
+    private JLabel          serverLabel;
     private JButton         startButton;
     private JButton         stopButton;
     private JButton         settingsButton;
@@ -302,6 +303,8 @@ public class MainWindow extends JFrame
         //panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        serverLabel = new JLabel();
+
         settingsButton = new JButton("Server Settings...");
         settingsButton.addActionListener(new ActionListener() {
             @Override
@@ -329,6 +332,9 @@ public class MainWindow extends JFrame
                 onStopClick();
             }
         });
+
+        panel.add(serverLabel);
+        updateServerLabel();
 
         panel.add(settingsButton);
         panel.add(startButton);
@@ -467,6 +473,15 @@ public class MainWindow extends JFrame
 
         serverSettingsWindow.loadConfig();
         serverSettingsWindow.setVisible(true);
+    }
+
+    public void updateServerLabel()
+    {
+        String url = InkinCrmVideoUploader.getServerUrl();
+
+        serverLabel.setText(url.equals("")
+                ? ""
+                : "Uploading to " + url);
     }
 
     public void onStartClick()
