@@ -52,10 +52,14 @@ public class VideoVariantConverterTask
     @Override
     public void onProgress(float progress)
     {
-        InkinCrmVideoUploader.updateFileProgress(
-                filePath,
+        fileTask.setProgress(
                 videoVariantSettings.getResolutionString(),
                 progress);
+
+//        InkinCrmVideoUploader.updateFileProgress(
+//                filePath,
+//                videoVariantSettings.getResolutionString(),
+//                progress);
     }
 
     public VideoVariantConverter getConverter()

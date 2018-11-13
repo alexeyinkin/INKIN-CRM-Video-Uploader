@@ -3,6 +3,8 @@ package ru.inkin.inkincrm.videouploader;
 import java.io.*;
 import java.util.regex.*;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
@@ -17,11 +19,19 @@ public class FileTask
     private String      thumbPath;
     private VideoInfo   sourceInfo;
     private long        videoId;
+    private byte        status      = READY;
+    private final List<FileTaskListener>    listeners   = new ArrayList<>();
 
     private static int nextIndex    = 0;
 
     public static final byte    UPLOAD_NEW  = 0;
     public static final byte    REPLACE     = 1;
+
+    public static final byte    READY       = 0;
+    public static final byte    WAITING     = 1;
+    public static final byte    IN_PROGRESS = 2;
+    public static final byte    COMPLETE    = 3;
+    public static final byte    ABORTED     = 4;
 
     public void setFile(File file)
     {
@@ -203,5 +213,28 @@ public class FileTask
     {
         //  TODO: Allow per-video settings, return them here.
         return InkinCrmVideoUploader.getSelectedBitrates();
+    }
+
+    public void setStatus(byte status)
+    {
+        this.status = status;
+
+        for (FileTaskListener listener : listeners)
+        {
+            listener.onStatusChange(status);
+        }
+    }
+
+    public void setProgress(String resolution, float progress)
+    {
+        for (FileTaskListener listener : listeners)
+        {
+            listener.onProgress(resolution, progress);
+        }
+    }
+
+    public void addListener(FileTaskListener listener)
+    {
+        listeners.add(listener);
     }
 }

@@ -18,7 +18,7 @@ public abstract class TaskProcessor
     public static final boolean LAST        = true;
     public static final boolean NOT_LAST    = false;
 
-    protected void processTaskIfShould(InTask task)
+    protected void processTask(InTask task)
     {
         if (task.isEmpty())
         {
@@ -26,13 +26,8 @@ public abstract class TaskProcessor
         }
         else
         {
-            processTask(task);
+            task.process();
         }
-    }
-
-    protected void processTask(InTask task)
-    {
-        task.process();
     }
 
     public void start()
@@ -102,6 +97,11 @@ public abstract class TaskProcessor
         sendTaskToNext(empty);
     }
 
+    protected boolean isTaskCancelled(InTask task)
+    {
+        return false;
+    }
+
     private class TaskProcessorRunnable implements Runnable
     {
         @Override
@@ -112,7 +112,11 @@ public abstract class TaskProcessor
                 try
                 {
                     InTask task = tasks.take();
-                    processTaskIfShould(task);
+
+                    if (!isTaskCancelled(task))
+                    {
+                        processTask(task);
+                    }
                 }
                 catch (InterruptedException e)
                 {

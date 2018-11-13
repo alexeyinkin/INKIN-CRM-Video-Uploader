@@ -33,13 +33,8 @@ public abstract class JoiningTaskProcessor
     }
 
     @Override
-    public void processTaskIfShould(InTask task)
+    public void processTask(InTask task)
     {
-        if (task.getClass().getSimpleName().equals("VideoFinalizerTask"))
-        {
-            System.out.println("");
-        }
-
         if (!task.isEmpty())
         {
             //  A sub-task has completed. The joiner is not complete yet.

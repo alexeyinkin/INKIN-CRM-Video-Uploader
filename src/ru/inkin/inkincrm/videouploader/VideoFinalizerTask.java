@@ -19,7 +19,8 @@ public class VideoFinalizerTask extends JoiningTaskGeneric<VideoFinalizerTaskPro
 
         if (uploadThumb())
         {
-            showComplete();
+            //showComplete();
+            fileTask.setStatus(FileTask.COMPLETE);
             nextStep();
         }
     }
@@ -54,10 +55,10 @@ public class VideoFinalizerTask extends JoiningTaskGeneric<VideoFinalizerTaskPro
         return true;
     }
 
-    private void showComplete()
-    {
-        InkinCrmVideoUploader.showFileComplete(fileTask.getFile().getAbsolutePath());
-    }
+//    private void showComplete()
+//    {
+//        InkinCrmVideoUploader.showFileComplete(fileTask.getFile().getAbsolutePath());
+//    }
 
     private VideoCreatorTask getVideoCreatorTask()
     {

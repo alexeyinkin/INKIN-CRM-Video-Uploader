@@ -520,22 +520,4 @@ public class MainWindow extends JFrame
 
         settingsButton.setEnabled(true);
     }
-
-    public void showFileInProgress(String filePath)
-    {
-        filePanels.get(filePath).showInProgress();
-    }
-
-    public void showFileComplete(String filePath)
-    {
-        filePanels.get(filePath).showComplete();
-    }
-
-    public void updateFileProgress(
-            String  filePath,
-            String  resolution,
-            float   progress)
-    {
-        filePanels.get(filePath).updateProgress(resolution, progress);
-    }
 }

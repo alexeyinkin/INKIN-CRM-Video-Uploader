@@ -35,6 +35,7 @@ public class FilePanel extends JPanel
     public void setFileTask(FileTask fileTask)
     {
         this.fileTask = fileTask;
+        fileTask.addListener(new PanelFileTaskListener());
     }
 
     public void init()
@@ -237,7 +238,7 @@ public class FilePanel extends JPanel
         return bytes;
     }
 
-    public void showInProgress()
+    private void showInProgress()
     {
         emptyStatusPanel();
 
@@ -273,7 +274,7 @@ public class FilePanel extends JPanel
         mainWindow.pack();
     }
 
-    public void updateProgress(String resolution, float progress)
+    private void updateProgress(String resolution, float progress)
     {
         progressBars.get(resolution).setValue((int) Math.ceil(progress * 100));
     }
@@ -281,9 +282,12 @@ public class FilePanel extends JPanel
     public void showAborted()
     {
         emptyStatusPanel();
+
+        setBackground(new Color(
+                (float) 0.3, (float) 0, (float) 0, (float) .3));
     }
 
-    public void showComplete()
+    private void showComplete()
     {
         emptyStatusPanel();
         createEditInBrowserButton();
@@ -334,5 +338,33 @@ public class FilePanel extends JPanel
                     + "/admin/list/videos/" + fileTask.getVideoId()));
         }
         catch (Exception e) {}
+    }
+
+    private class PanelFileTaskListener implements FileTaskListener
+    {
+        @Override
+        public void onStatusChange(byte status)
+        {
+            switch (status)
+            {
+                case FileTask.IN_PROGRESS:
+                    showInProgress();
+                    break;
+
+                case FileTask.COMPLETE:
+                    showComplete();
+                    break;
+
+                case FileTask.ABORTED:
+                    showAborted();
+                    break;
+            }
+        }
+
+        @Override
+        public void onProgress(String resolution, float progress)
+        {
+            updateProgress(resolution, progress);
+        }
     }
 }
