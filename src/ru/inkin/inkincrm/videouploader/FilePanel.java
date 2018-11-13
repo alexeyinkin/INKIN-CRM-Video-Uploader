@@ -35,7 +35,7 @@ public class FilePanel extends JPanel
     public void setFileTask(FileTask fileTask)
     {
         this.fileTask = fileTask;
-        fileTask.addListener(new PanelFileTaskListener());
+        fileTask.addListener(new PrivateFileTaskListener());
     }
 
     public void init()
@@ -162,13 +162,14 @@ public class FilePanel extends JPanel
     private void createRemoveButton()
     {
         removeButton = new JButton();
-        removeButton.setText("X");
+        removeButton.setText("❌");
 
         removeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                InkinCrmVideoUploader.removeFileTask(fileTask);
+                onRemoveClick();
+                //InkinCrmVideoUploader.removeFileTask(fileTask);
             }
         });
 
@@ -180,6 +181,23 @@ public class FilePanel extends JPanel
         c.anchor    = GridBagConstraints.LAST_LINE_START;
 
         add(removeButton, c);
+    }
+
+    private void onRemoveClick()
+    {
+        LineProcessor lineProcessor = InkinCrmVideoUploader.getLineProcessor();
+
+        synchronized (lineProcessor)
+        {
+            if (lineProcessor.isInProgress())
+            {
+                fileTask.setStatus(FileTask.ABORTED);
+            }
+            else
+            {
+                InkinCrmVideoUploader.removeFileTask(fileTask);
+            }
+        }
     }
 
     private ImageIcon getThumb()
@@ -270,13 +288,23 @@ public class FilePanel extends JPanel
             progressBars.put(resolution, progressBar);
         }
 
+        packWindow();
+    }
+
+    private void packWindow()
+    {
         JFrame mainWindow = (JFrame) SwingUtilities.getWindowAncestor(this);
         mainWindow.pack();
     }
 
     private void updateProgress(String resolution, float progress)
     {
-        progressBars.get(resolution).setValue((int) Math.ceil(progress * 100));
+        JProgressBar progressBar = progressBars.get(resolution);
+
+        if (progressBar != null)    //  Could be deleted if aborted.
+        {
+            progressBar.setValue((int) Math.ceil(progress * 100));
+        }
     }
 
     public void showAborted()
@@ -285,6 +313,8 @@ public class FilePanel extends JPanel
 
         setBackground(new Color(
                 (float) 0.3, (float) 0, (float) 0, (float) .3));
+
+        packWindow();
     }
 
     private void showComplete()
@@ -294,6 +324,8 @@ public class FilePanel extends JPanel
 
         setBackground(new Color(
                 (float) 0, (float) 0.3, (float) 0, (float) .3));
+
+        packWindow();
     }
 
     private void emptyStatusPanel()
@@ -340,7 +372,7 @@ public class FilePanel extends JPanel
         catch (Exception e) {}
     }
 
-    private class PanelFileTaskListener implements FileTaskListener
+    private class PrivateFileTaskListener implements FileTaskListener
     {
         @Override
         public void onStatusChange(byte status)

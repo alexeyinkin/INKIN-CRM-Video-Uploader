@@ -499,7 +499,7 @@ public class MainWindow extends JFrame
         return Long.parseLong(replaceIdField.getText());
     }
 
-    public void setInProgressMode()
+    private void setInProgressMode()
     {
         actionsPanel.setEnabled(false);
         resolutionsPanel.setEnabled(false);
@@ -510,7 +510,7 @@ public class MainWindow extends JFrame
         settingsButton.setEnabled(false);
     }
 
-    public void setIdleMode()
+    private void setIdleMode()
     {
         actionsPanel.setEnabled(true);
         resolutionsPanel.setEnabled(true);
@@ -519,5 +519,28 @@ public class MainWindow extends JFrame
         startButton.setVisible(true);
 
         settingsButton.setEnabled(true);
+    }
+
+    public void setLineProcessor(LineProcessor lineProcessor)
+    {
+        lineProcessor.addListener(new PrivateLineProcessorListener());
+    }
+
+    private class PrivateLineProcessorListener implements LineProcessorListener
+    {
+        @Override
+        public void onStatusChange(byte status)
+        {
+            switch (status)
+            {
+                case InkinCrmVideoUploaderLineProcessor.IDLE:
+                    setIdleMode();
+                    break;
+
+                case InkinCrmVideoUploaderLineProcessor.IN_PROGRESS:
+                    setInProgressMode();
+                    break;
+            }
+        }
     }
 }

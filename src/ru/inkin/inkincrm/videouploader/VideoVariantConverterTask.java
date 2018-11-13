@@ -10,6 +10,16 @@ public class VideoVariantConverterTask
     private VideoVariantSettings    videoVariantSettings;
 
     @Override
+    public void init()
+    {
+        VideoVariantCreatorTask parent1     = getVideoVariantCreatorTask();
+        VideoCreatorTask        parent2     = parent1.getVideoCreatorTask();
+
+        fileTask                = parent2.getFileTask();
+        videoVariantSettings    = parent1.getVideoVariantSettings();
+    }
+
+    @Override
     public void process()
     {
         start();
@@ -17,12 +27,7 @@ public class VideoVariantConverterTask
 
     private void start()
     {
-        VideoVariantCreatorTask parent1     = getVideoVariantCreatorTask();
-        VideoCreatorTask        parent2     = parent1.getVideoCreatorTask();
-
-        fileTask                = parent2.getFileTask();
-        filePath                = fileTask.getFile().getAbsolutePath();
-        videoVariantSettings    = parent1.getVideoVariantSettings();
+        filePath                = fileTask.getFile().getAbsolutePath();        
         videoVariantConverter   = new VideoVariantConverter();
 
         videoVariantConverter.setFileTask(fileTask);
@@ -65,5 +70,11 @@ public class VideoVariantConverterTask
     public VideoVariantConverter getConverter()
     {
         return videoVariantConverter;
+    }
+
+    @Override
+    public boolean isCancelled()
+    {
+        return fileTask != null && fileTask.getStatus() == FileTask.ABORTED;
     }
 }

@@ -21,6 +21,7 @@ public class VideoVariantConverter
     private VideoSegmentInfo        currentSegmentInfo;
     private int                     nextSegmentIndex            = 0;
     private final List<VideoVariantConverterListener> listeners = new ArrayList<>();
+    private Process                 ffmpegProcess;
 
     private String                  encryptionIvAsString;
     private String                  encryptionKeyAsString;
@@ -56,6 +57,7 @@ public class VideoVariantConverter
         new File(variantDirName).mkdirs();
 
         duration = fileTask.getSourceInfo().duration;
+        fileTask.addListener(new PrivateFileTaskListener());
     }
 
     private void createPreencryptionKey()
@@ -156,14 +158,14 @@ public class VideoVariantConverter
 
         try
         {
-            Process pr = runtime.exec(cmd);
-            new StreamGobbler(pr.getInputStream()).start();
+            ffmpegProcess = runtime.exec(cmd);
+            new StreamGobbler(ffmpegProcess.getInputStream()).start();
 
             //pr.waitFor();
 
             //System.out.println(cmd);
             //System.out.println(pr.exitValue());
-            BufferedReader r = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+            BufferedReader r = new BufferedReader(new InputStreamReader(ffmpegProcess.getErrorStream()));
             String line;// = buf.readLine();
 
             while ((line = r.readLine()) != null)
@@ -247,6 +249,14 @@ public class VideoVariantConverter
         }
     }
 
+    private void abort()
+    {
+        if (ffmpegProcess != null && ffmpegProcess.isAlive())
+        {
+            ffmpegProcess.destroy();
+        }
+    }
+
     public void addListener(VideoVariantConverterListener listener)
     {
         listeners.add(listener);
@@ -278,5 +288,23 @@ public class VideoVariantConverter
     public String getEncryptionKeyAsString()
     {
         return encryptionKeyAsString;
+    }
+
+    private class PrivateFileTaskListener implements FileTaskListener
+    {
+        @Override
+        public void onStatusChange(byte status)
+        {
+            switch (status)
+            {
+                case FileTask.ABORTED:
+                    abort();
+            }
+        }
+
+        @Override
+        public void onProgress(String resolution, float progress)
+        {
+        }
     }
 }

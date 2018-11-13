@@ -225,11 +225,24 @@ public class FileTask
         }
     }
 
+    public byte getStatus()
+    {
+        return status;
+    }
+
     public void setProgress(String resolution, float progress)
     {
         for (FileTaskListener listener : listeners)
         {
             listener.onProgress(resolution, progress);
+        }
+    }
+
+    public synchronized void abortIfNotComplete()
+    {
+        if (status != COMPLETE)
+        {
+            setStatus(ABORTED);
         }
     }
 

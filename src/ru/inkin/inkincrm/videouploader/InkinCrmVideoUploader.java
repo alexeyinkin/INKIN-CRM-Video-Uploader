@@ -15,13 +15,15 @@ public class InkinCrmVideoUploader
 {
     final static String audioOnlyString    = "🔊 Only";
 
-    private static String[]     resolutions = {"1080", "720", "480", "360", "240", "120", audioOnlyString};
+    private static final String[]     RESOLUTIONS = {"1080", "720", "480", "360", "240", "120", audioOnlyString};
+
     private static File         workingDir;
     private static String       workingDirName;
     private static MainWindow   mainWindow;
-    private static SortedMap<String, BitratePreset> bitratePresets = new TreeMap<>();
-    private static Map<String, String>              config;
-    private static SortedMap<String, FileTask>      fileTasks = new TreeMap<>();
+    private static Map<String, String> config;
+
+    private static final SortedMap<String, BitratePreset> bitratePresets = new TreeMap<>();
+    private static final SortedMap<String, FileTask>      fileTasks = new TreeMap<>();
     //private static JsonObject   config;
 
     private static Image        appIconImage;
@@ -29,12 +31,15 @@ public class InkinCrmVideoUploader
     private static HostValidator    hostValidator;
     private static TokenValidator   tokenValidator;
 
-    private static LineProcessor    lineProcessor;
+    private static InkinCrmVideoUploaderLineProcessor    lineProcessor;
+
+    public static final byte IDLE           = 0;
+    public static final byte IN_PROGRESS    = 1;
 
     private static void createAndShowGUI()
     {
         mainWindow = new MainWindow();
-        mainWindow.setResolutions(resolutions);
+        mainWindow.setResolutions(RESOLUTIONS);
         mainWindow.setBitratePresets(bitratePresets);
         mainWindow.initAndShow();
         mainWindow.setVisible(true);
@@ -335,21 +340,34 @@ public class InkinCrmVideoUploader
 
     public static void startQueue()
     {
-        mainWindow.setInProgressMode();
+        //mainWindow.setInProgressMode();
 
         //JOptionPane.showMessageDialog(null, "Start!");
-        if (lineProcessor == null) lineProcessor = new LineProcessor();
-        lineProcessor.start();
+        
+        getLineProcessor().start();
     }
 
     public static void stopQueue()
     {
-        mainWindow.setIdleMode();
+        //mainWindow.setIdleMode();
+        for (String filePath : fileTasks.keySet())
+        {
+            FileTask fileTask = fileTasks.get(filePath);
+            fileTask.abortIfNotComplete();
+        }
+
+        getLineProcessor().stop();
     }
 
-    public static void onQueueComplete()
+    public static LineProcessor getLineProcessor()
     {
-        mainWindow.setIdleMode();
+        if (lineProcessor == null)
+        {
+            lineProcessor = new InkinCrmVideoUploaderLineProcessor();
+            mainWindow.setLineProcessor(lineProcessor);
+        }
+
+        return lineProcessor;
     }
 
     public static byte getAction()

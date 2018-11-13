@@ -1,54 +1,57 @@
 package ru.inkin.inkincrm.videouploader;
 
-public class LineProcessor
+import java.util.List;
+import java.util.ArrayList;
+
+public abstract class LineProcessor
 {
-    private QueueStarterTaskProcessor           queueStarter;
-    private VideoCreatorTaskProcessor           videoCreator;
-    private VideoVariantCreatorTaskProcessor    videoVariantCreator;
-    private VideoVariantConverterTaskProcessor  videoVariantConverter;
-    private VideoSegmentUploaderTaskProcessor   videoSegmentUploader;
-    private VideoVariantFinalizerTaskProcessor  videoVariantFinalizer;
-    private VideoFinalizerTaskProcessor         videoFinalizer;
-    private QueueFinalizerTaskProcessor         queueFinalizer;
+    private byte status = IDLE;
+    private final List<LineProcessorListener>   listeners   = new ArrayList<>();
 
-    private void initIfNot()
+    public static final byte IDLE           = 0;
+    public static final byte IN_PROGRESS    = 1;
+
+    public abstract void start();
+
+    /**
+     * Called by QueueFinalizerTask when the queue is complete.
+     */
+    public void onComplete()
     {
-        if (queueStarter != null) return;
-
-        queueStarter            = new QueueStarterTaskProcessor();
-        videoCreator            = new VideoCreatorTaskProcessor();
-        videoVariantCreator     = new VideoVariantCreatorTaskProcessor();
-        videoVariantConverter   = new VideoVariantConverterTaskProcessor();
-        videoSegmentUploader    = new VideoSegmentUploaderTaskProcessor();
-        videoVariantFinalizer   = new VideoVariantFinalizerTaskProcessor();
-        videoFinalizer          = new VideoFinalizerTaskProcessor();
-        queueFinalizer          = new QueueFinalizerTaskProcessor();
-
-        queueStarter.setNextProcessor(videoCreator);
-        videoCreator.setNextProcessor(videoVariantCreator);
-        videoVariantCreator.setNextProcessor(videoVariantConverter);
-        videoVariantConverter.setNextProcessor(videoSegmentUploader);
-        videoSegmentUploader.setNextProcessor(videoVariantFinalizer);
-        videoVariantFinalizer.setNextProcessor(videoFinalizer);
-        videoFinalizer.setNextProcessor(queueFinalizer);
-
-        //  Create and start threads to wait on their queues.
-        queueStarter.start();
-        videoCreator.start();
-        videoVariantCreator.start();
-        videoVariantConverter.start();
-        videoSegmentUploader.start();
-        videoVariantFinalizer.start();
-        videoFinalizer.start();
-        queueFinalizer.start();
+        setStatus(IDLE);
     }
 
-    public void start()
+    public synchronized void stop()
     {
-        initIfNot();
-        QueueStarterTask task = new QueueStarterTask();
-        task.setFileTasks(InkinCrmVideoUploader.getFileTasks());
+        if (status == IN_PROGRESS)
+        {
+            //  TODO: Abort all tasks in the queue.
+            setStatus(IDLE);
+        }
+    }
 
-        queueStarter.addTask(task); //, TaskProcessor.LAST);
+    public void setStatus(byte status)
+    {
+        this.status = status;
+
+        for (LineProcessorListener listener : listeners)
+        {
+            listener.onStatusChange(status);
+        }
+    }
+
+    public byte getStatus()
+    {
+        return status;
+    }
+
+    public boolean isInProgress()
+    {
+        return status == IN_PROGRESS;
+    }
+
+    public void addListener(LineProcessorListener listener)
+    {
+        listeners.add(listener);
     }
 }

@@ -1,6 +1,5 @@
 package ru.inkin.inkincrm.videouploader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +18,20 @@ public abstract class Task
     private boolean         splitting = false;
 
     abstract public void process();
+
+    /**
+     * Called before processing and before determining if it isCancelled().
+     */
+    public void init()
+    {
+    }
+
+    public boolean isCancelled()
+    {
+        if (trace == null) return false;
+
+        return trace.getLastLine().task.isCancelled();
+    }
 
     public void setOrigin(Task origin)
     {

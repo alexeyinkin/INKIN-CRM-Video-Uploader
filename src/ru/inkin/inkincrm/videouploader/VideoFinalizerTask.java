@@ -15,7 +15,7 @@ public class VideoFinalizerTask extends JoiningTaskGeneric<VideoFinalizerTaskPro
     @Override
     public void processFinalizing()
     {
-        init();
+        initPrivate();
 
         if (uploadThumb())
         {
@@ -25,10 +25,9 @@ public class VideoFinalizerTask extends JoiningTaskGeneric<VideoFinalizerTaskPro
         }
     }
 
-    private void init()
+    private void initPrivate()
     {
         VideoCreatorTask videoCreatorTask = getVideoCreatorTask();
-
         fileTask = videoCreatorTask.getFileTask();
     }
 

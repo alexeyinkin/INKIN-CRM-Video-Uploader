@@ -97,11 +97,6 @@ public abstract class TaskProcessor
         sendTaskToNext(empty);
     }
 
-    protected boolean isTaskCancelled(InTask task)
-    {
-        return false;
-    }
-
     private class TaskProcessorRunnable implements Runnable
     {
         @Override
@@ -112,8 +107,9 @@ public abstract class TaskProcessor
                 try
                 {
                     InTask task = tasks.take();
+                    task.init();
 
-                    if (!isTaskCancelled(task))
+                    if (!task.isCancelled())
                     {
                         processTask(task);
                     }

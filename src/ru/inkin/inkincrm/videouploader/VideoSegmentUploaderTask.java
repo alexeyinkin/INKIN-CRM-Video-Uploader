@@ -9,11 +9,12 @@ public class VideoSegmentUploaderTask extends TaskGeneric<VideoSegmentUploaderTa
 {
     private VideoVariantSettings    videoVariantSettings;
     private VideoSegmentInfo        videoSegmentInfo;
+    private FileTask                fileTask;
 
     @Override
     public void process()
     {
-        init();
+        initPrivate();
 
         if (upload())
         {
@@ -21,7 +22,7 @@ public class VideoSegmentUploaderTask extends TaskGeneric<VideoSegmentUploaderTa
         }
     }
 
-    private void init()
+    private void initPrivate()
     {
         videoVariantSettings = getVideoVariantConverterTask()
                 .getVideoVariantCreatorTask()

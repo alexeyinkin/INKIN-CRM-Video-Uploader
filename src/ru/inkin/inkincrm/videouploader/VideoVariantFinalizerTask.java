@@ -20,7 +20,7 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
     @Override
     public void processFinalizing()
     {
-        init();
+        initPrivate();
 
         if (uploadPlaylist())
         {
@@ -31,7 +31,7 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
         }
     }
 
-    private void init()
+    private void initPrivate()
     {
         videoVariantSettings    = getVideoVariantCreatorTask().getVideoVariantSettings();
         converter               = getVideoVariantConverterTask().getConverter();

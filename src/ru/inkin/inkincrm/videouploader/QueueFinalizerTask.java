@@ -8,6 +8,6 @@ public class QueueFinalizerTask extends JoiningTaskGeneric<QueueFinalizerTaskPro
     @Override
     public void processFinalizing()
     {
-        InkinCrmVideoUploader.onQueueComplete();
+        getProcessor().onComplete();
     }
 }
