@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.json.*;
+import javax.json.stream.JsonParsingException;
 
 public class InkinCrmVideoUploader
 {
@@ -526,8 +527,28 @@ public class InkinCrmVideoUploader
                 writer.append("--" + boundary + "--").append(CRLF).flush();
             }
 
-            JsonReader reader = Json.createReader(connection.getInputStream());
-            return reader.readObject();
+            Scanner s = new Scanner(connection.getInputStream()).useDelimiter("\\A");
+            String response = s.hasNext() ? s.next() : "";
+
+            JsonReader reader = Json.createReader(new StringReader(response));
+            JsonObject jsonResponse = null;
+
+            try
+            {
+                jsonResponse = reader.readObject();
+            }
+            catch (JsonParsingException e)
+            {
+                System.out.println("Error parsing response JSON: " + response);
+            }
+            finally
+            {
+                reader.close();
+            }
+
+            return jsonResponse;
+            //JsonReader reader = Json.createReader(connection.getInputStream());
+            //return reader.readObject();
         }
         catch (Exception e)
         {
