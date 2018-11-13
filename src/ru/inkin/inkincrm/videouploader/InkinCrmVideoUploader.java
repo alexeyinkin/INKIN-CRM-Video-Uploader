@@ -382,13 +382,18 @@ public class InkinCrmVideoUploader
         return mainWindow.getReplaceVideoId();
     }
 
-    public static JsonObject applyServerCommand(JsonObject command)
+    public static JsonObject applyServerCommand(
+            JsonObject          command,
+            OutputStreamWriter  logger)
     {
         return applyServerCommands(
-                Json.createArrayBuilder().add(command).build());
+                Json.createArrayBuilder().add(command).build(),
+                logger);
     }
 
-    public static JsonObject applyServerCommands(JsonArray commands)
+    public static JsonObject applyServerCommands(
+            JsonArray           commands,
+            OutputStreamWriter  logger)
     {
         try
         {
@@ -403,7 +408,11 @@ public class InkinCrmVideoUploader
             params.put("commands",  baos.toString(charset));
             params.put("return",    "*");
 
-            return callServerMethod("Core", "applyCommands", params, null);
+            return callServerMethod(
+                    "Core", "applyCommands",
+                    params,
+                    null,
+                    logger);
         }
         catch (UnsupportedEncodingException e)
         {
@@ -465,17 +474,25 @@ public class InkinCrmVideoUploader
             String              className,
             String              method,
             Map<String, String> params,
-            Map<String, File>   filesToUpload)
+            Map<String, File>   filesToUpload,
+            OutputStreamWriter  logger)
     {
+        if (logger == null)
+        {
+            logger = new OutputStreamWriter(System.out);
+        }
+
         try
         {
-            params.put("token",                 getApiToken());
-            params.put("inkincrm-no-device",    "1");
-
             String charset = java.nio.charset.StandardCharsets.UTF_8.name();
             URL url = new URL(
                     getServerUrl() +
                     "/inkincrm-ajax/" + className + "/" + method);
+
+            logger.write("Calling " + url.toString() + "\n");
+
+            params.put("inkincrm-no-device",    "1");
+            params.put("token",                 getApiToken());
 
             URLConnection   connection  = url.openConnection();
             String          CRLF        = "\r\n"; // Line separator required by multipart/form-data.
@@ -536,10 +553,19 @@ public class InkinCrmVideoUploader
             try
             {
                 jsonResponse = reader.readObject();
+
+                if (!jsonResponse.getString("status").equals("ok"))
+                {
+                    StringWriter writer = new StringWriter();
+                    Json.createWriter(writer).write(jsonResponse);
+                    String toLog = "Received not OK: " + writer.toString();
+
+                    logger.write(toLog + "\n");
+                }
             }
             catch (JsonParsingException e)
             {
-                System.out.println("Error parsing response JSON: " + response);
+                logger.write("Error parsing response JSON: " + response + "\n");
             }
             finally
             {

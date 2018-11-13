@@ -15,6 +15,8 @@ public class FileTask
 {
     private final int   index = nextIndex++;
     private File        file;
+    private File        logFile;
+    private FileWriter  logger;
     private String      dirName;
     private String      thumbPath;
     private VideoInfo   sourceInfo;
@@ -45,8 +47,18 @@ public class FileTask
 
     public boolean init()
     {
-        if (!createFolder())    return false;
-        if (!saveThumb())       return false;
+        if (!createFolder()) return false;
+
+        try
+        {
+            logger = new SynchronizedFileWriter(getLogFile());
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
+
+        if (!saveThumb()) return false;
 
         loadSourceInfo();
 
@@ -217,6 +229,8 @@ public class FileTask
 
     public void setStatus(byte status)
     {
+        log("Setting status: " + status);   //  TODO: Readable statuses.
+
         this.status = status;
 
         for (FileTaskListener listener : listeners)
@@ -249,5 +263,45 @@ public class FileTask
     public void addListener(FileTaskListener listener)
     {
         listeners.add(listener);
+    }
+
+    public File getLogFile()
+    {
+        if (logFile == null)
+        {
+            logFile = new File(dirName + "/log.txt");
+        }
+        return logFile;
+    }
+
+    public synchronized boolean log(String str)
+    {
+        try
+        {
+            logger.write(str + "\n");
+            return true;
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
+    }
+
+    public OutputStreamWriter getLogger()
+    {
+        return logger;
+    }
+
+    public boolean flushLogger()
+    {
+        try
+        {
+            logger.flush();
+            return true;
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
     }
 }

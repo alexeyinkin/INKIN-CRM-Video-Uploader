@@ -310,6 +310,7 @@ public class FilePanel extends JPanel
     public void showAborted()
     {
         emptyStatusPanel();
+        createViewLogButton();
 
         setBackground(new Color(
                 (float) 0.3, (float) 0, (float) 0, (float) .3));
@@ -360,6 +361,28 @@ public class FilePanel extends JPanel
         statusPanel.add(editInBrowserButton, c);
     }
 
+    private void createViewLogButton()
+    {
+        editInBrowserButton = new JButton();
+        editInBrowserButton.setText("View Log...");
+
+        editInBrowserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                viewLog();
+            }
+        });
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx     = 1;
+        c.gridy     = 0;
+        c.weightx   = 1;
+        c.weighty   = 1;
+        c.anchor    = GridBagConstraints.LAST_LINE_START;
+        statusPanel.add(editInBrowserButton, c);
+    }
+
     private void editInBrowser()
     {
         try
@@ -368,6 +391,15 @@ public class FilePanel extends JPanel
             desktop.browse(new URI(
                     InkinCrmVideoUploader.getServerUrl()
                     + "/admin/list/videos/" + fileTask.getVideoId()));
+        }
+        catch (Exception e) {}
+    }
+
+    private void viewLog()
+    {
+        try
+        {
+            Desktop.getDesktop().edit(fileTask.getLogFile());
         }
         catch (Exception e) {}
     }

@@ -24,9 +24,12 @@ public class VideoSegmentUploaderTask extends TaskGeneric<VideoSegmentUploaderTa
 
     private void initPrivate()
     {
-        videoVariantSettings = getVideoVariantConverterTask()
-                .getVideoVariantCreatorTask()
-                .getVideoVariantSettings();
+        VideoVariantCreatorTask parent2 = getVideoVariantConverterTask().getVideoVariantCreatorTask();
+
+        videoVariantSettings    = parent2.getVideoVariantSettings();
+        fileTask                = parent2.getVideoCreatorTask().getFileTask();
+
+        fileTask.log("Uploading segment: " + videoSegmentInfo.localFile.getAbsolutePath());
     }
 
     private boolean upload()
@@ -44,8 +47,10 @@ public class VideoSegmentUploaderTask extends TaskGeneric<VideoSegmentUploaderTa
                 "Video",
                 "uploadSegmentFile",
                 params,
-                filesToUpload);
+                filesToUpload,
+                fileTask.getLogger());
 
+        fileTask.flushLogger();
         return obj != null && obj.getString("status").equals("ok");
     }
 

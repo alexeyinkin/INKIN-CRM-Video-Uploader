@@ -74,7 +74,9 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
 
         try
         {
-            JsonObject response = InkinCrmVideoUploader.applyServerCommand(command);
+            JsonObject response = InkinCrmVideoUploader.applyServerCommand(
+                    command,
+                    fileTask.getLogger());
 
             fileTask.setVideoId(
                     response
@@ -106,7 +108,8 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
                 "Video",
                 "emptyVideo",
                 params,
-                null);          //  Files.
+                null,                   //  Files.
+                fileTask.getLogger());
 
         if (response == null || !response.getString("status").equals("ok"))
         {
@@ -124,7 +127,10 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
                 //.add("value",   fileName)
                 .build();
 
-        response = InkinCrmVideoUploader.applyServerCommand(command);
+        response = InkinCrmVideoUploader.applyServerCommand(
+                command,
+                fileTask.getLogger());
+
         return response != null && response.getString("status").equals("ok");
     }
 

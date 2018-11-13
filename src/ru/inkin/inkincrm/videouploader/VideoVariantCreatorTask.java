@@ -47,7 +47,9 @@ public class VideoVariantCreatorTask extends TaskGeneric<VideoVariantCreatorTask
 
         try
         {
-            JsonObject response = InkinCrmVideoUploader.applyServerCommand(command);
+            JsonObject response = InkinCrmVideoUploader.applyServerCommand(
+                    command,
+                    fileTask.getLogger());
 
             settings.setVideoVariantId(
                     response

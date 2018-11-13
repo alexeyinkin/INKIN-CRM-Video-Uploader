@@ -44,7 +44,11 @@ public class VideoFinalizerTask extends JoiningTaskGeneric<VideoFinalizerTaskPro
                 "Image",
                 "upload",
                 params,
-                filesToUpload);
+                filesToUpload,
+                fileTask.getLogger());
+
+        fileTask.log("Video complete: " + fileTask.getFile().getAbsolutePath());
+        fileTask.flushLogger();
 
         if (obj == null || !obj.getString("status").equals("ok"))
         {

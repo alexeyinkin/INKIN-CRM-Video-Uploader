@@ -12,6 +12,7 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
 {
     private VideoVariantSettings    videoVariantSettings;
     private VideoVariantConverter   converter;
+    private FileTask                fileTask;
     private long                    firstSegmentId;
 
     /**
@@ -33,8 +34,11 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
 
     private void initPrivate()
     {
-        videoVariantSettings    = getVideoVariantCreatorTask().getVideoVariantSettings();
+        VideoVariantCreatorTask creatorTask = getVideoVariantCreatorTask();
+
+        videoVariantSettings    = creatorTask.getVideoVariantSettings();
         converter               = getVideoVariantConverterTask().getConverter();
+        fileTask                = creatorTask.getVideoCreatorTask().getFileTask();
     }
 
     /**
@@ -54,7 +58,8 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
                 "Video",
                 "uploadVariantPlaylist",
                 params,
-                filesToUpload);
+                filesToUpload,
+                fileTask.getLogger());
 
         if (obj == null || !obj.getString("status").equals("ok"))
         {
@@ -94,7 +99,7 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
                 .build();
 
         //  TODO: Handle errors.
-        InkinCrmVideoUploader.applyServerCommand(command);
+        InkinCrmVideoUploader.applyServerCommand(command, fileTask.getLogger());
     }
 
     /**
@@ -114,8 +119,10 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
                 )
                 .build();
 
-        //  TODO: Handle errors.
-        InkinCrmVideoUploader.applyServerCommand(command);
+        InkinCrmVideoUploader.applyServerCommand(command, fileTask.getLogger());
+
+        fileTask.log("Variant uploaded: " + videoVariantSettings.getResolutionString());
+        fileTask.flushLogger();
     }
 
     private VideoVariantConverterTask getVideoVariantConverterTask()
