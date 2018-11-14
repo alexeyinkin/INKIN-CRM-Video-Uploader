@@ -113,11 +113,11 @@ public class InkinCrmVideoUploader
         preset = new BitratePreset(title);
         base = 3240000;
         preset.addBitrate("1080",       (int) base);
-        preset.addBitrate("720",        (int) (base * 720 * 720 / 1080 / 1080));
-        preset.addBitrate("480",        (int) (base * 480 * 480 / 1080 / 1080));
-        preset.addBitrate("360",        (int) (base * 360 * 360 / 1080 / 1080));
-        preset.addBitrate("240",        (int) (base * 240 * 240 / 1080 / 1080));
-        preset.addBitrate("120",        (int) (base * 120 * 120 / 1080 / 1080));
+        preset.addBitrate("720",        (int) (base * 720 / 1080));
+        preset.addBitrate("480",        (int) (base * 480 / 1080));
+        preset.addBitrate("360",        (int) (base * 360 / 1080));
+        preset.addBitrate("240",        (int) (base * 240 / 1080));
+        preset.addBitrate("120",        (int) (base * 120 / 1080));
         preset.addBitrate(AUDIO_ONLY_STRING, 0);
         bitratePresets.put(title, preset);
 
@@ -125,11 +125,11 @@ public class InkinCrmVideoUploader
         preset = new BitratePreset(title);
         base = 405000;
         preset.addBitrate("1080",       (int) base);
-        preset.addBitrate("720",        (int) (base * 720 * 720 / 1080 / 1080));
-        preset.addBitrate("480",        (int) (base * 480 * 480 / 1080 / 1080));
-        preset.addBitrate("360",        (int) (base * 360 * 360 / 1080 / 1080));
-        preset.addBitrate("240",        (int) (base * 240 * 240 / 1080 / 1080));
-        preset.addBitrate("120",        (int) (base * 120 * 120 / 1080 / 1080));
+        preset.addBitrate("720",        (int) (base * 720 / 1080));
+        preset.addBitrate("480",        (int) (base * 480 / 1080));
+        preset.addBitrate("360",        (int) (base * 360 / 1080));
+        preset.addBitrate("240",        (int) (base * 240 / 1080));
+        preset.addBitrate("120",        (int) (base * 120 / 1080));
         preset.addBitrate(AUDIO_ONLY_STRING, 0);
         bitratePresets.put(title, preset);
     }
