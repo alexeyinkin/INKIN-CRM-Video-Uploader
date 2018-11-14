@@ -342,7 +342,7 @@ public class FilePanel extends JPanel
     private void createEditInBrowserButton()
     {
         editInBrowserButton = new JButton();
-        editInBrowserButton.setText("Edit in Browser...");
+        editInBrowserButton.setText("Edit in Browser or Add to Courses...");
 
         editInBrowserButton.addActionListener(new ActionListener() {
             @Override
