@@ -14,9 +14,17 @@ import javax.json.stream.JsonParsingException;
 
 public class InkinCrmVideoUploader
 {
-    final static String audioOnlyString    = "🔊 Only";
+    public final static String AUDIO_ONLY_STRING = "🔊 Only";
 
-    private static final String[]     RESOLUTIONS = {"1080", "720", "480", "360", "240", "120", audioOnlyString};
+    private static final String[] RESOLUTIONS = {
+        "1080",
+        "720",
+        "480",
+        "360",
+        "240",
+        "120"//,
+        //audioOnlyString
+    };
 
     private static File         workingDir;
     private static String       workingDirName;
@@ -110,7 +118,7 @@ public class InkinCrmVideoUploader
         preset.addBitrate("360",        (int) (base * 360 * 360 / 1080 / 1080));
         preset.addBitrate("240",        (int) (base * 240 * 240 / 1080 / 1080));
         preset.addBitrate("120",        (int) (base * 120 * 120 / 1080 / 1080));
-        preset.addBitrate(audioOnlyString, 0);
+        preset.addBitrate(AUDIO_ONLY_STRING, 0);
         bitratePresets.put(title, preset);
 
         title = "Slides + Speaker";
@@ -122,7 +130,7 @@ public class InkinCrmVideoUploader
         preset.addBitrate("360",        (int) (base * 360 * 360 / 1080 / 1080));
         preset.addBitrate("240",        (int) (base * 240 * 240 / 1080 / 1080));
         preset.addBitrate("120",        (int) (base * 120 * 120 / 1080 / 1080));
-        preset.addBitrate(audioOnlyString, 0);
+        preset.addBitrate(AUDIO_ONLY_STRING, 0);
         bitratePresets.put(title, preset);
     }
 

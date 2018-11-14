@@ -256,7 +256,7 @@ public class MainWindow extends JFrame
             c.weighty   = 1;
             resolutionsPanel.add(toggle, c);
 
-            if (!r.equals(InkinCrmVideoUploader.audioOnlyString))
+            if (!r.equals(InkinCrmVideoUploader.AUDIO_ONLY_STRING))
             {
                 //JTextField field = new JFormattedTextField(dFormat);
                 JTextField field = new JTextField();
