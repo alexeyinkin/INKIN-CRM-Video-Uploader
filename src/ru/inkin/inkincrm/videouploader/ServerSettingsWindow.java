@@ -209,17 +209,20 @@ public class ServerSettingsWindow extends JFrame
     private void showHostValid()
     {
         hostStatusLabel.setIcon(validIcon);
+        manageTokensButton.setEnabled(true);
         validateTokenAndUpdateStatus();
     }
 
     private void showHostInvalid()
     {
         hostStatusLabel.setIcon(invalidIcon);
+        manageTokensButton.setEnabled(false);
     }
 
     private void showHostPending()
     {
         hostStatusLabel.setIcon(pendingIcon);
+        manageTokensButton.setEnabled(false);
     }
 
     private void initTokenValidator()
