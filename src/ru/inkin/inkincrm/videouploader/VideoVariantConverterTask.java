@@ -35,7 +35,7 @@ public class VideoVariantConverterTask
         videoVariantConverter.addListener(this);
         videoVariantConverter.start();
 
-        getProcessor().sendNoMoreSubTasks(this); //, VideoSegmentUploaderTask.class);
+        getProcessor().sendNoMoreSubTasks(this);
     }
 
     public VideoVariantCreatorTask getVideoVariantCreatorTask()
@@ -48,10 +48,9 @@ public class VideoVariantConverterTask
     {
         VideoVariantConverterTaskProcessor  processor = getProcessor();
         VideoSegmentUploaderTask nextTask = processor.createNextTask(this);
-                //this, VideoSegmentUploaderTask.class);
 
         nextTask.setVideoSegmentInfo(videoSegmentInfo);
-        processor.sendTaskToNext(nextTask); //, TaskProcessor.NOT_LAST);
+        processor.sendTaskToNext(nextTask);
     }
 
     @Override
@@ -60,11 +59,6 @@ public class VideoVariantConverterTask
         fileTask.setProgress(
                 videoVariantSettings.getResolutionString(),
                 progress);
-
-//        InkinCrmVideoUploader.updateFileProgress(
-//                filePath,
-//                videoVariantSettings.getResolutionString(),
-//                progress);
     }
 
     public VideoVariantConverter getConverter()

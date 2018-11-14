@@ -179,6 +179,14 @@ public class VideoVariantConverter
                 processLine(line);
             }
 
+            ffmpegProcess.waitFor();
+
+            if (ffmpegProcess.exitValue() != 0)
+            {
+                fileTask.log("ffmpeg exit code: " + ffmpegProcess.exitValue());
+                fileTask.setStatus(FileTask.ABORTED);
+            }
+
             onCurrentSegmentFileReady();    //  Yield the last segment.
             fileTask.log("Variant converted: " + variantSettings.getResolutionString());
             fileTask.flushLogger();

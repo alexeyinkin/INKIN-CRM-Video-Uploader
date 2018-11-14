@@ -16,7 +16,11 @@ public class VideoSegmentUploaderTask extends TaskGeneric<VideoSegmentUploaderTa
     {
         initPrivate();
 
-        if (upload())
+        if (!upload())
+        {
+            fileTask.setStatus(FileTask.ABORTED);
+        }
+        else
         {
             nextStep();
         }
@@ -43,7 +47,7 @@ public class VideoSegmentUploaderTask extends TaskGeneric<VideoSegmentUploaderTa
 
         filesToUpload.put("file", videoSegmentInfo.localFile);
 
-        JsonObject obj = InkinCrmVideoUploader.callServerMethod(
+        JsonObject response = InkinCrmVideoUploader.callServerMethod(
                 "Video",
                 "uploadSegmentFile",
                 params,
@@ -51,7 +55,7 @@ public class VideoSegmentUploaderTask extends TaskGeneric<VideoSegmentUploaderTa
                 fileTask.getLogger());
 
         fileTask.flushLogger();
-        return obj != null && obj.getString("status").equals("ok");
+        return response != null && response.getString("status").equals("ok");
     }
 
     /**

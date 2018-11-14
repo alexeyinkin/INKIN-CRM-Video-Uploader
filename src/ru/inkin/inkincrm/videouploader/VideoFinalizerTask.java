@@ -17,8 +17,15 @@ public class VideoFinalizerTask extends JoiningTaskGeneric<VideoFinalizerTaskPro
     {
         initPrivate();
 
-        if (uploadThumb())
+        if (!uploadThumb())
         {
+            fileTask.setStatus(FileTask.ABORTED);
+        }
+        else
+        {
+            fileTask.log("Video complete: " + fileTask.getFile().getAbsolutePath());
+            fileTask.flushLogger();
+
             //showComplete();
             fileTask.setStatus(FileTask.COMPLETE);
             nextStep();
@@ -40,22 +47,14 @@ public class VideoFinalizerTask extends JoiningTaskGeneric<VideoFinalizerTaskPro
         params.put("id",        String.valueOf(fileTask.getVideoId()));
         filesToUpload.put("playlist", fileTask.getThumbFile());
 
-        JsonObject obj = InkinCrmVideoUploader.callServerMethod(
+        JsonObject response = InkinCrmVideoUploader.callServerMethod(
                 "Image",
                 "upload",
                 params,
                 filesToUpload,
                 fileTask.getLogger());
 
-        fileTask.log("Video complete: " + fileTask.getFile().getAbsolutePath());
-        fileTask.flushLogger();
-
-        if (obj == null || !obj.getString("status").equals("ok"))
-        {
-            return false;
-        }
-
-        return true;
+        return response != null && response.getString("status").equals("ok");
     }
 
 //    private void showComplete()

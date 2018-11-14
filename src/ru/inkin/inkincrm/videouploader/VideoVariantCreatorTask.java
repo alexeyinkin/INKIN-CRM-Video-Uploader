@@ -5,7 +5,8 @@ import javax.json.JsonObject;
 
 public class VideoVariantCreatorTask extends TaskGeneric<VideoVariantCreatorTaskProcessor>
 {
-    private VideoVariantSettings settings;
+    private VideoVariantSettings    settings;
+    private FileTask                fileTask;
 
     public void setVideoVariantSettings(VideoVariantSettings settings)
     {
@@ -13,9 +14,19 @@ public class VideoVariantCreatorTask extends TaskGeneric<VideoVariantCreatorTask
     }
 
     @Override
+    public void init()
+    {
+        fileTask = getVideoCreatorTask().getFileTask();
+    }
+
+    @Override
     public void process()
     {
-        if (createNew())
+        if (!createNew())
+        {
+            fileTask.setStatus(FileTask.ABORTED);
+        }
+        else
         {
             nextStep();
         }
@@ -28,7 +39,6 @@ public class VideoVariantCreatorTask extends TaskGeneric<VideoVariantCreatorTask
 
     private boolean createNew()
     {
-        FileTask    fileTask    = getVideoCreatorTask().getFileTask();
         VideoInfo   sourceInfo  = fileTask.getSourceInfo();
         String      tempId      = "new" + fileTask.getIndex();
 

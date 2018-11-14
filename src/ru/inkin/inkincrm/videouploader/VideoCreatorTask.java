@@ -22,7 +22,11 @@ public class VideoCreatorTask extends TaskGeneric<VideoCreatorTaskProcessor>
     @Override
     public void process()
     {
-        if (initVideo())
+        if (!initVideo())
+        {
+            fileTask.setStatus(FileTask.ABORTED);
+        }
+        else
         {
             //showInProgress();
             fileTask.setStatus(FileTask.IN_PROGRESS);

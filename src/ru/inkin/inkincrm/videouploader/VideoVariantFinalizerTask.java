@@ -23,10 +23,29 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
     {
         initPrivate();
 
-        if (uploadPlaylist())
+        boolean result = uploadPlaylist();
+
+        if (result)
         {
-            updateFirstVideoSegment();
-            markVideoVariantProcessed();
+            result = updateFirstVideoSegment();
+        }
+
+        if (result)
+        {
+            result = markVideoVariantProcessed();
+        }
+
+        if (!result)
+        {
+            fileTask.setStatus(FileTask.ABORTED);
+        }
+        else
+        {
+            fileTask.log(
+                    "Variant uploaded: "
+                    + videoVariantSettings.getResolutionString());
+
+            fileTask.flushLogger();
 
             nextStep();
         }
@@ -73,7 +92,7 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
     /**
      * Sets the encryption key, IV, etc.
      */
-    private void updateFirstVideoSegment()
+    private boolean updateFirstVideoSegment()
     {
         JsonObject segmentParams = Json.createObjectBuilder()
                 .add("encryptionMethod",    "AES-128")
@@ -98,15 +117,18 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
                 )
                 .build();
 
-        //  TODO: Handle errors.
-        InkinCrmVideoUploader.applyServerCommand(command, fileTask.getLogger());
+        JsonObject response = InkinCrmVideoUploader.applyServerCommand(
+                command,
+                fileTask.getLogger());
+
+        return response != null && response.getString("status").equals("ok");
     }
 
     /**
      * Sets the flags at server marking that the variant is uploaded
      * and processed.
      */
-    private void markVideoVariantProcessed()
+    private boolean markVideoVariantProcessed()
     {
         JsonObject command = Json.createObjectBuilder()
                 .add("action",  "edit")
@@ -119,10 +141,11 @@ public class VideoVariantFinalizerTask extends JoiningTaskGeneric<VideoVariantFi
                 )
                 .build();
 
-        InkinCrmVideoUploader.applyServerCommand(command, fileTask.getLogger());
+        JsonObject response = InkinCrmVideoUploader.applyServerCommand(
+                command,
+                fileTask.getLogger());
 
-        fileTask.log("Variant uploaded: " + videoVariantSettings.getResolutionString());
-        fileTask.flushLogger();
+        return response != null && response.getString("status").equals("ok");
     }
 
     private VideoVariantConverterTask getVideoVariantConverterTask()
