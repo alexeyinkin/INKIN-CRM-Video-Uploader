@@ -288,10 +288,13 @@ public class ServerSettingsWindow extends JFrame
         {
             Desktop desktop = Desktop.getDesktop();
             desktop.browse(new URI(
-                    InkinCrmVideoUploader.getServerUrl()
+                    InkinCrmVideoUploader.fixServerUrl(hostField.getText())
                     + "/admin/list/operation-tokens"));
         }
-        catch (Exception e) {}
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
     }
 
     private boolean isHostValidSync()
