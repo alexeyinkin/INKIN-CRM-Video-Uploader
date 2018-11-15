@@ -140,30 +140,89 @@ public class VideoVariantConverter
         //  because it is said to give a better quality:
         //  https://trac.ffmpeg.org/wiki/Encode/AAC
 
-        String cmd = "\"" + InkinCrmVideoUploader.getFfmpegPath() + "\" "
-                + "-i \"" + fileTask.getFile().getAbsolutePath() + "\" "
-                //+ "-acodec copy "
-                + "-c:a aac "                                                   //  Audio codec
-                + "-b:a 128k "                                                  //  Audio bitrate
-                + "-vb " + variantSettings.getBitsPerSecond() + " "             //  Video bitrate
-                + "-vf scale=" + variantSettings.getWidth() + ":" + variantSettings.getHeight() + " " //  Video resolution
-                //+ "-vf scale=-1:" + variantSettings.getHeight() + " "           //  Video resolution
-                + "-c:v h264 "                                                  //  Video codec
-                + "-g 48 -keyint_min 48 "
-                + "-profile:v main "
-                + "-sc_threshold 0 "
-                + "-hls_segment_filename \"" + variantDirName + "/" + variantSettings.getHeight() + "p_%d.ts\" "
-                + "-hls_time 10 "
-                + "-hls_key_info_file \"" + getKeyInfoPath() + "\" "
-                + "-hls_playlist_type vod "
-                + "\"" + getPlaylistFileName() + "\"";
-                //+ "\"" + variantDirName + "/" + variantSettings.getHeight() + ".m3u8\"";
+        List<String> commandList = new ArrayList<>();
+
+        commandList.add(InkinCrmVideoUploader.getFfmpegPath());
+
+        commandList.add("-i");
+        commandList.add(fileTask.getFile().getAbsolutePath());
+
+        //  Audio codec.
+        commandList.add("-c:a");
+        commandList.add("aac");
+
+        //  Audio bitrate.
+        commandList.add("-b:a");
+        commandList.add("128k");
+
+        //  Video bitrate.
+        commandList.add("-vb");
+        commandList.add(String.valueOf(variantSettings.getBitsPerSecond()));
+
+        //  Video resolution.
+        commandList.add("-vf");
+        commandList.add(
+                "scale=" +
+                variantSettings.getWidth() + ":" +
+                variantSettings.getHeight());
+
+        //  Video codec.
+        commandList.add("-c:v");
+        commandList.add("h264");
+
+        commandList.add("-g");
+        commandList.add("48");
+
+        commandList.add("-keyint_min");
+        commandList.add("48");
+
+        commandList.add("-profile:v");
+        commandList.add("main");
+
+        commandList.add("-sc_threshold");
+        commandList.add("0");
+
+        commandList.add("-hls_segment_filename");
+        commandList.add(
+                variantDirName + "/" + variantSettings.getHeight() + "p_%d.ts");
+
+        commandList.add("-hls_time");
+        commandList.add("10");
+
+        commandList.add("-hls_key_info_file");
+        commandList.add(getKeyInfoPath());
+
+        commandList.add("-hls_playlist_type");
+        commandList.add("vod");
+
+        commandList.add(getPlaylistFileName());
+
+//        String cmd = "\"" + InkinCrmVideoUploader.getFfmpegPath() + "\" "
+//                + "-i \"" + fileTask.getFile().getAbsolutePath() + "\" "
+//                //+ "-acodec copy "
+//                + "-c:a aac "                                                   //  Audio codec
+//                + "-b:a 128k "                                                  //  Audio bitrate
+//                + "-vb " + variantSettings.getBitsPerSecond() + " "             //  Video bitrate
+//                + "-vf scale=" + variantSettings.getWidth() + ":" + variantSettings.getHeight() + " " //  Video resolution
+//                //+ "-vf scale=-1:" + variantSettings.getHeight() + " "           //  Video resolution
+//                + "-c:v h264 "                                                  //  Video codec
+//                + "-g 48 -keyint_min 48 "
+//                + "-profile:v main "
+//                + "-sc_threshold 0 "
+//                + "-hls_segment_filename \"" + variantDirName + "/" + variantSettings.getHeight() + "p_%d.ts\" "
+//                + "-hls_time 10 "
+//                + "-hls_key_info_file \"" + getKeyInfoPath() + "\" "
+//                + "-hls_playlist_type vod "
+//                + "\"" + getPlaylistFileName() + "\"";
+//                //+ "\"" + variantDirName + "/" + variantSettings.getHeight() + ".m3u8\"";
 
         Runtime runtime = Runtime.getRuntime();
 
         try
         {
-            ffmpegProcess = runtime.exec(cmd);
+            String[] commandArray = new String[commandList.size()];
+            commandList.toArray(commandArray);
+            ffmpegProcess = runtime.exec(commandArray);
             new StreamGobbler(ffmpegProcess.getInputStream()).start();
 
             //pr.waitFor();

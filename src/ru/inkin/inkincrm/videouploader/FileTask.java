@@ -84,24 +84,51 @@ public class FileTask
     {
         thumbPath = dirName + "/thumb.jpg";
 
-        String cmd = "\"" + InkinCrmVideoUploader.getFfmpegPath() + "\" "
-                + "-ss 3 "                                  //  3 seconds
-                + "-i \"" + file.getAbsolutePath() + "\" "
-                + "-vframes 1 "
-                + "-q:v 2 "
-                + "\"" + thumbPath + "\"";
+        List<String> commandList = new ArrayList<>();
+
+        commandList.add(InkinCrmVideoUploader.getFfmpegPath());
+
+        commandList.add("-ss");
+        commandList.add("3");
+
+        commandList.add("-i");
+        commandList.add(file.getAbsolutePath());
+
+        commandList.add("-vframes");
+        commandList.add("1");
+
+        commandList.add("-q:v");
+        commandList.add("2");
+
+        commandList.add(thumbPath);
 
         Runtime runtime = Runtime.getRuntime();
 
         try
         {
-            Process pr = runtime.exec(cmd);
-            pr.waitFor();
+            String[] commandArray = new String[commandList.size()];
+            commandList.toArray(commandArray);
+            Process process = runtime.exec(commandArray);
+            process.waitFor();
 
-            if (pr.exitValue() != 0 || !(new File(thumbPath).exists()))
+            if (process.exitValue() != 0 || !(new File(thumbPath).exists()))
             {
                 return false;
             }
+        }
+        catch (IOException e)
+        {
+            String message =
+                    "The 'ffmpeg' video converter not found.\n"
+                    + "Download it and put to:\n"
+                    + InkinCrmVideoUploader.getFfmpegPath();
+
+            log(e.getMessage());
+            log(message);
+            flushLogger();
+
+            JOptionPane.showMessageDialog(null, message);
+            return false;
         }
         catch (Exception e)
         {
@@ -118,17 +145,20 @@ public class FileTask
 
     private boolean loadSourceInfo()
     {
-        String cmd = "\"" + InkinCrmVideoUploader.getFfmpegPath() + "\" "
-                + "-i \"" + file.getAbsolutePath() + "\" ";
-                //+ "2>&1";                                   //  stderr -> stdout
+        List<String> commandList = new ArrayList<>();
 
-        Runtime     runtime = Runtime.getRuntime();
-        //VideoInfo   info    = new VideoInfo();
-        String      output  = "";
+        commandList.add(InkinCrmVideoUploader.getFfmpegPath());
+        commandList.add("-i");
+        commandList.add(file.getAbsolutePath());
+
+        Runtime runtime = Runtime.getRuntime();
+        String  output  = "";
 
         try
         {
-            Process pr = runtime.exec(cmd);
+            String[] commandArray = new String[commandList.size()];
+            commandList.toArray(commandArray);
+            Process pr = runtime.exec(commandArray);
             pr.waitFor();
             //int n = pr.exitValue();
 
