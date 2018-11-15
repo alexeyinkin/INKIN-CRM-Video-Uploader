@@ -27,6 +27,8 @@ public class FilePanel extends JPanel
     private JButton     editInBrowserButton;
     private final Map<String, JProgressBar> progressBars = new HashMap<>();
 
+    private final static ImageIcon removeIcon = new ImageIcon(InkinCrmVideoUploader.class.getResource("/resources/delete.png"));
+
     public FilePanel()
     {
         super(new GridBagLayout());
@@ -161,8 +163,10 @@ public class FilePanel extends JPanel
 
     private void createRemoveButton()
     {
-        removeButton = new JButton();
-        removeButton.setText("❌");
+        removeButton = new JButton(removeIcon);
+        //removeButton.setText("❌");
+        removeButton.setBorder(BorderFactory.createEmptyBorder());
+        removeButton.setContentAreaFilled(false);
 
         removeButton.addActionListener(new ActionListener() {
             @Override
