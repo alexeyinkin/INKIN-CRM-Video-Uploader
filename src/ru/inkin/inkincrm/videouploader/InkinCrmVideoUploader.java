@@ -28,6 +28,7 @@ public class InkinCrmVideoUploader
 
     private static File         workingDir;
     private static String       workingDirName;
+    private static String       ffmpegPath;
     private static MainWindow   mainWindow;
     private static Map<String, String> config;
 
@@ -146,7 +147,32 @@ public class InkinCrmVideoUploader
 
     public static String getFfmpegPath()
     {
-        return workingDirName + "/tools/ffmpeg";
+        if (ffmpegPath == null)
+        {
+            String osName = System.getProperty("os.name");
+
+            //  Possible values:
+            //  http://lopica.sourceforge.net/os.html
+
+            if (osName.startsWith("Windows"))
+            {
+                ffmpegPath = workingDirName + "/external/ffmpeg.exe";
+            }
+            else if (osName.startsWith("Mac"))
+            {
+                ffmpegPath = workingDirName + "/external/ffmpeg_mac";
+            }
+            else
+            {
+                //  Each UNIX would have its own build.
+                //  We do not provide them. Instead, if the file is not found
+                //  the message box will instruct to put it here.
+                ffmpegPath = workingDirName + "/external/ffmpeg";
+            }
+        }
+
+        return ffmpegPath;
+        //return workingDirName + "/external/ffmpeg_mac";
     }
 
     public static boolean isFileTaskDuplicate(FileTask fileTask)
